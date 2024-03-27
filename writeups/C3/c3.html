@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="resources/icon-processor.png">
+    <title>CTF</title>
+</head>
+<body>
+    <a href="../../ctf.html">CTF writeups</a>
+    <br>
+    <br>
+    <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>C3 was one of the more controversial challenges of picoctf2024. I think this can be attributed to the guesswork required to solve the second half of the challenge.</p>
+    <h2>Part 1</h2>
+    <p>Anyway, here is the given encoder:</p>
+    <img src="encoder.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>So here we see that for each character, it is looking up index (cur-prev)%40 in lookup2 and adding that to the output.</p>
+    <p>Thus, we can iterate through the output ourselves and for each character, calculate (secret-prev)%40 checking at which index the character appears in lookup2.</p>
+    <p>Here, secret is an integer representing the which index of lookup1 that contains the secret character.</p>
+    <p>But you'll notice that in order to solve for secret, we need to know prev.</p>
+    <p>It is given that prev for our first character is 0.</p>
+    <p>Feeling lazy and not wanting to do math, I decided to modify the encoder to print out (secret-prev)%40, secret-prev, and prev for each character and search for a pattern. Here I used the test string "honey".</p>
+    <img src="logs.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>After staring at this output for some time, I realized the following:</p>
+    <ul>
+        <li>(secret-prev)%40[i] is already known for all i</li>
+        <li>secret-prev[i] = (secret-prev)%40[i] when (secret-prev)%40[i]+prev[i-1] < 40</li>
+        <li>secret-prev[i] = (secret-prev)%40[i]-40 when (secret-prev)%40[i]+prev[i-1] >= 40</li>
+        <li>prev[i] = the sum of secret-prev in range (0, i-1)</li>
+    </ul>
+    <p>Given these rules I was able to calculate secret-prev and prev for each character. Here is my script for doing that. (The rules may be a little more coherent in this format as well.)</p>
+    <img src="decode.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>The mathematicians reading now probably realize that if I know the quantities (secret-prev) and (prev) for each character, the secret isn't so secret anymore.</p>
+    <img src="ptrecover.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <h2>Part 2</h2>
+    <img src="pythontwo.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>Here is the plaintext. It's a python 2 script that reads in a file, and spits out the characters that are at perfect cube indices [1, 8, 27, 64, ...]</p>
+    <p>The big question is, what file are you supposed to feed this script? The answer is itself.</p>
+    <img src="flag.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>And per the instructions you need to wrap the final flag yourself, yielding</p>
+    <i>picoCTF{adlibs}</i>
+    <p>If you can believe it, guessing which file you were supposed to input took longer than part 1 for many people including myself.</p>
+    <img src="hatred1.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <img src="hatred2.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <img src="hatred3.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <img src="hatred4.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <img src="hatred5.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <img src="hatred6.png" style="width:30%;height:30%;border: 5px solid #555;">
+
+</body>
+</html>
