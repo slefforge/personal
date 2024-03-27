@@ -1,50 +1,51 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-<meta name="DESCRIPTION"
-content="This is the homepage of Sam Lefforge">
-<title>Sam Lefforges's Homepage</title>
-<link rel="icon" type="image/png" href="resources/icon-processor.png">
-</head>
-<style>
-body {
-    background-color:#54585A;
-    margin: 0; 
-    padding: 0;
-}
-#wrapper {
-    background-color:#D6DBD4;
-    width: 45%;
-    /* height: 100%; */
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-p {
-    width: 90%;
-}
+    <meta name="DESCRIPTION" content="This is the homepage of Sam Lefforge">
+    <title>Sam Lefforges's Homepage</title>
+    <link rel="icon" type="image/png" href="resources/icon-processor.png">
+    <style>
+        body {
+            background-color: #54585A;
+            margin: 0;
+            padding: 0;
+        }
 
-/* body {} */
-</style>
-<br>
-<div id="wrapper">
-<center>
-<a href="https://github.com/slefforge">github</a>
-|
-<a href="https://sheets.google.com">google sheets</a>
-<br>
-<br>
-<img src="resources/name.gif">
-<br>
-<img src="resources/contact.gif">
-<br>
-<br>
-<img src="resources/sam2.png" alt="Sam Lefforge">
-<p>
-    Hi, I'm Sam Lefforge. I am a student at <a href="https://www.gatech.edu/">Georgia Tech</a>.
-</p>
-</center>
+        #wrapper {
+            background-color: #D6DBD4;
+            width: fit-content; /* Set width to fit content */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        p {
+            width: 90%;
+        }
+
+        /* body {} */
+    </style>
+</head>
+
+<body>
+    <br>
+    <div id="wrapper">
+        <center>
+            <a href="https://github.com/slefforge">github</a> |
+            <a href="https://slefforge.github.io/ctf.html">CTF writeups</a> |
+            <a href="https://sheets.google.com">google sheets</a>
+            <br><br>
+            <img src="resources/name.gif">
+            <br>
+            <img src="resources/contact.gif" id="contact-image"> <!-- Added id for targeting -->
+            <br><br>
+            <img src="resources/sam2.png" alt="Sam Lefforge">
+            <p>Hi, I'm Sam Lefforge. I am a student at <a href="https://www.gatech.edu/">Georgia Tech</a>.
+            </p>
+        </center>
+    </div>
 </body>
-</div>
+
 </html>
