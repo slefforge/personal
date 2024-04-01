@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../resources/icon-processor.png">
+    <title>CTF</title>
+</head>
+<body>
+    <a href="../../CTF.html">CTF writeups</a>
+    <br>
+    <br>
+    <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>I suspect most people solved this with a wordlist based bruteforced approach. Writeups demonstrating this can be found <a href="https://connor-mccartney.github.io/cryptography/other/UTCTF-2024", target=”_blank”>here</a> and <a href="https://meashiri.github.io/ctf-writeups/posts/202403-utctf/#cryptordle", target=”_blank”>here</a>.</p>
+    <p>Instead of pulling from a wordlist, I extracted as much information as I could from the encoding function and did some guessing to figure out the rest.</p>
+    <p>In hindsight, my method was much more expensive (both for the computer and for my brain), but it was at least an interesting challenge.</p>
+    <h2>Reverse Engineering Word Encodings</h2>
+    <img src="encoding.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>After the user inputs a five letter word, this bit of code spits out some feedback.</p>
+    <p>For a moment, pretend that instead of five letter words, this program delt with strings consisting of a single character. How might we reverse this function in that case?</p>
+    <h4>One Letter Attack</h4>
+    <p>The attacker submits the string 'a'.</p>
+    <p>alph() is a function that returns a character's 0-indexed place in the alphabet. alph('a') = 0, alph('b') = 1, etc.</p>
+    <img src="1chrattack.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>And just like that, we've got a way to crack the one character variant of this problem.</p>
+    <p>Keep in mind that we used one guess 'a' to obtain this information.</p>
+    <h4>Two Letter Attack</h4>
+    <p>I demonstrated above that if the response from the first round of calculations is known, you can solve for the first character.</p>
+    <p>So our goal should be to solve for this result (response<sub>a</sub>) as well as the final character of the secret (secret[1]).</p>
+    <p>The attacker submits the string 'aa'.</p>
+    <p>Let us examine the calculations for when x = 1 (the second round) and see what we find.</p>
+    <img src="2chrattack1.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>We seem to be at a dead-end here with two unknowns, response<sub>a</sub> and secret[1].</p>
+    <p>Time to submit another guess. This time we'll use 'ab'.</p>
+    <img src="2chrattack2.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>We can combine these results to solve for response<sub>a</sub>.</p>
+    <img src="2chrattack3.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>Now that we know response<sub>a</sub>, our next step is to repeat the one character attack.</p>
+    <p>Of course, there's no need to submit another guess. We can just use the following formula to compute the first character.</p>
+    <img src="2chrattack4.png" style="width:20%;height:20%;border: 5px solid #555;">
+    <p>We also now have enough information to find secret[1]. Notice that now, the final lines of our calculations for our guesses 'aa' and 'ab' now contain only a single unknown, secret[1]</p>
+    <p>There are only 26 possible values of secret[1], so it is easy to check each one and see which satisfies those equations (there will always be exaclty one solution).</p>
+    <p>Now we've recovered secret[0] and secret[1], and that's the full string! This time it took us two guesses.</p>
+    <h4>Three Letter Attack</h4>
+    <ul>
+        <li>The attacker submits the guesses 'aaa' and 'aab' and performs the two character attack to recover response<sub>aa</sub>.</li>
+        <ul>
+            <li>The procedure for this is identical to the recovery of response<sub>a</sub> in the original two character attack.</li>
+        </ul>
+        <li>The attacker submits the guesses 'aba' and 'abb' and performs the two character attack to recover response<sub>ab</sub>.</li>
+        <li>As shown above, we can recover secret[0] and secret[1] with response<sub>aa</sub> and response<sub>ab</sub>.</li>
+        <li>We recover secret[2] by testing all 26 possibilities using the same formula as we did in the two character attack.</li>
+    </ul>
+    <h4>Five Letter Attack?</h4>
+    <p>Our one letter attack took one guess, our two letter attack took two guesses, and our three letter attack took four guesses.</p>
+    <p>Indeed, we can continue this cycle of coming up with attacks by repeating our old ones, but the number of guesses will grow exponentially.</p>
+    <p>Continuing down this road, this style of attack on an n-length word will require 2<sup>n</sup> guesses.</p>
+    <p>This challenge only allows us to have 6 guesses, and only 5 of those can be used to gather information (we need to reserve a guess for "submitting" the final word).</p>
+    <p>So we would need 2<sup>5</sup> = 32 guesses to reliably determine the word (plus one for submission), which is unfortunately far too many.</p>
+    <p>This means our five letter attack is going to require some luck.</p>
+    <h2>Making Educated Guesses</h2>
+    <p>Well my five letter attack didn't work out, but I had a perfectly good three letter attack.</p>
+    <p>Lets not waste it, we can presume to know the last two characters already and make use of our attack.</p>
+    <h4>Assuming The Ending</h4>
+    <p>The three character attack requires us to know the response we would recieve for the strings 'aaa', 'aab', 'aba', and 'abb'.</p>
+    <p>However, in the actual problem, the oracle will only accept responses that are exactly five characters in length.</p>
+    <img src="encoding.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>If you'll look at the encoding code again, you may see there is a way to form our guesses so we can recover this information easily.</p>
+    <p>As long as (a-b) evaluates to 1, then the response will always be equal to whatever the response was on the previous iterations.</p>
+    <p>Lets say we want to assume the ending 'xx'.</p>
+    <p>We can submit the guess 'aaayy', and the response we recieve will be exactly what the three letter version of the oracle would have given us for input 'aaa'.</p>
+    <p>To get this effect, you can take each letter of your assumed ending and instead guess the next letter in the alphabet.</p>
+    <p>(Yes, this means we can't assume that the word has a z in the final two letters, but this really doesn't matter as you'll see in a moment.)</p>
+    <h4>Strategically Picking Our Assumption</h4>
+    <p>Assuming that the word truly ends in 'xx' is a pretty tough bet. We can definitely pick a more common word ending.</p>
+    <img src="endings1.png" style="width:20%;height:20%;border: 5px solid #555;">
+    <p>Here are the most common two character word endings from the list of accepted wordle words.</p>
+    <p>If I knew they were using this wordlist for the challenge, then I would just pick "es" and move on, but I wanted to be sure as I knew my solution would take a LONG time to run.</p>
+    <p>So I went the extra step and queried the actual oracle over and over again, recording how often each of these 10 word endings were used in practice.</p>
+    <p>I won't get into the details, but checking for a two character word ending was a much easier problem to solve than determining a five character word.</p>
+    <img src="endings2.png" style="width:15%;height:15%;border: 5px solid #555;">
+    <p>This shows the probability of each ending appearing based on a sample of 250 oracle-generated words.</p>
+    <p>Based on this info, I decided to assume ending "er" (which means I used "fs" at the end of my guesses).</p>
+    <h4>Waiting</h4>
+    <p>This attack will ONLY work if the secret word ends in "er".</p>
+    <p>Additionally, a few hours into the CTF the admins implemented an anti-brute forcing measure: to recieve the flag, you had to correctly guess three words in a row.</p>
+    <p>This means I had to wait for the oracle to just happen to feed me three words in a row that each ended with "er".</p>
+    <p>Luckily, waiting is easy, and eventually I got the flag :)</p>
+    <img src="flag.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>The flag contains a valuable message. Next time, I will consider just guessing.</p>
+</body>
+</html>
