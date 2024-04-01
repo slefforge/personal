@@ -11,7 +11,7 @@
     <br>
     <br>
     <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
-    <p>Well, this is an audio challenge, so my first step was to download the audio from youtube and open in up in  <a href="https://www.audacityteam.org/", target=”_blank”>audacity</a></p>
+    <p>Well, this is an audio challenge, so my first step was to download the audio from youtube and open in up in  <a href="https://www.audacityteam.org/", target=”_blank”>audacity</a>.</p>
     <img src="waveform.png" style="width:30%;height:30%;border: 5px solid #555;">
     <p>Looking at this waveform, I saw a spike at around 3 hours in. Listening to that section, you can hear clear morse code beeps.</p>
     <audio controls src="chippi_raw.wav"></audio>
@@ -23,6 +23,7 @@
     </ol>
     <p>My idea was to take a segment of audio that synced up with the music to act as sort of a baseline for the background noise, then invert it so that it cancels out everything but the code.</p>
     <p>I created two tracks, one for the encoded audio and one for the baseline. I first synced them by ear, and then to get as precise as possible I zoomed in extremely close and tried to perfectly match the two waveforms up.</p>
+    <p>Then, I selected the baseline track with no morse code and applied Effect > Special > Invert.</p>
     <p>The waveforms were not a perfect match (something something audio compression, idk) but they were close enough to cancel out most of the song and produce this demonic sounding clip where you can hear the morse much more clearly.</p>
     <audio controls src="chippi_clean.wav"></audio>
     <p>This web-based <a href="https://morsecode.world/international/decoder/audio-decoder-adaptive.html", target=”_blank”>Morse Code Adaptive Audio Decoder</a> was able to do the rest of the work.</p>
