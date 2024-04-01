@@ -66,7 +66,7 @@
     <p>However, in the actual problem, the oracle will only accept responses that are exactly five characters in length.</p>
     <img src="encoding.png" style="width:30%;height:30%;border: 5px solid #555;">
     <p>If you'll look at the encoding code again, you may see there is a way to form our guesses so we can recover this information easily.</p>
-    <p>As long as (a-b) evaluates to 1, then the response will always be equal to whatever the response was on the previous iterations.</p>
+    <p>As long as (a-b) evaluates to 1, then the response will always be equal to whatever the response was on the previous iteration.</p>
     <p>Lets say we want to assume the ending 'xx'.</p>
     <p>We can submit the guess 'aaayy', and the response we recieve will be exactly what the three letter version of the oracle would have given us for input 'aaa'.</p>
     <p>To get this effect, you can take each letter of your assumed ending and instead guess the next letter in the alphabet.</p>
