@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../resources/icon-processor.png">
+    <title>CTF</title>
+</head>
+<body>
+    <a href="../../CTF.html">CTF writeups</a>
+    <br>
+    <br>
+    <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>After poking around in Wireshark for a bit, I saw that many of the packets in the provided pcap file contained information about keys being pressed.</p>
+    <img src="packet.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>These key presses don't follow the typical typing pattern where one key is pressed and released, then another is pressed and released, etc.</p>
+    <p>Instead, one chord of keys is being pressed and releaesed before moving on to the next.</p>
+    <p>I've thought a lot about alternative typing methods and have even abandoned qwerty myself, so with the help of the first hint, I recognized this input to be that of a <a href="https://en.wikipedia.org/wiki/Stenotype", target=”_blank”>stenotype</a>.</p>
+    <p>Well, not exactly. Stenotypes don't have keys like 'C' and 'V', as the above input shows. This input was instead created on a qwerty keyboard with something like <a href="https://www.openstenoproject.org/plover/", target=”_blank”>Plover</a>.</p>
+    <p>Before we can do any kind of processing on this data, we need to download it and clean it up a bit.</p>
+    <p><i>tshark -r keyboard.pcapng -Y 'usbhid.data' -Y "usb.dst == host" -T fields -e usbhid.data > raw.txt</i></p>
+    <img src="raw.png" style="width:10%;height:10%;border: 5px solid #555;">
+    <p>Here is a snippet of the data.</p>
+    <p>It doesn't look like much at first, but we can already see the formation of chords indicative of stenography, so we know we're on the right track.</p>
+    <img src="HID.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p><a href="https://www.mcselec.com/index.php?option=com_content&task=view&id=322", target=”_blank”>source</a></p>
+    <p>This seems to be the mapping used to encode the key presses.</p>
+    <img src="cleanscript.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>I wrote this script using the above mapping to try and create a nicer text file to work with.</p>
+    <img src="clean.png" style="width:5%;height:5%;border: 5px solid #555;">
+    <p>And here is the result. Now we can clearly see exactly what this person was inputting into their keyboard.</p>
+    <p>The only thing left to do is turn these inputs into readable text.</p>
+    <p>The simplest way I could think to do this was to find some qwerty-stenography software and write a script that performs these inputs locally.</p>
+    <p>I found <a href="https://www.openstenoproject.org/demo/", target=”_blank”>this web demo</a> that seems to work. I noticed it doesn't handle backspaces the way I'd expect, but I figured thats probably fine.</p>
+    <img src="botscript.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>Here's my script to press all the keys. I just ran this, opened the steno demo, and waited for something that looked like a flag.</p>
+    <video width="70%" height="70%" autoplay muted>
+        <source src="demo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+      </video>
+    <p>And we have our flag, <i>utflag{learning_stenography_on_a_qwerty_keyboard_is_quite_difficult}</i></p>
+    
+</body>
+</html>
