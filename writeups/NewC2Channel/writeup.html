@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../resources/icon-processor.png">
+    <title>CTF</title>
+</head>
+<body>
+    <a href="../../CTF.html">CTF writeups</a>
+    <br>
+    <br>
+    <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>This one was a fairly straightforward forensics challenge, but the solution looked quite pretty so I wanted to make a writeup anyways.</p>
+    <p>The first thing I noticed when I opened up the provided pcap file in Wireshark was that there seems to be some odd looking data being passed in to the 'page' parameter of the HTTP GET requests.</p>
+    <img src="pcap.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>At first the pattern isn't obvious, but if I double click on a random packet, I can see something interesting.</p>
+    <img src="packet1.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>When the data form this packet is arranged is 16 character rows, we can see that the strange looking data spells out a big letter 'a'.</p>
+    <p>And if I open up the next packet, I can see that the ASCII-art is shifted one column to the left.</p>
+    <img src="packet2.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>At this point I had a suspicion that if I looked at each of these packets in sequence, it would spell out a hidden message.</p>
+    <p>But I didn't really feel like doing this by hand in Wireshark, so I wrote a script to play out this animation for me.</p>
+    <p>First, I extracted the relevant data with the following command:</p>
+    <p><i>tshark -r playback.pcap -T fields -e http.request.uri http.request.method eq "GET" > extracted_data.txt</i></p>
+    <p>Then I animated the packet data with this script:</p>
+    <img src="script.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>This process produced this very satisfying looking result.</p>
+    <video width="70%" height="70%" autoplay muted>
+        <source src="animation.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <p>And from this video, we can see that the flag is <i>swampCTF{w3lc0m3_70_7h3_l4nd_0f_7h3_pc4p}</i>.</p>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../resources/icon-processor.png">
+    <title>CTF</title>
+</head>
+<body>
+    <a href="../../CTF.html">CTF writeups</a>
+    <br>
+    <br>
+    <img src="problem.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>Here is how the encryption is implemented.</p>
+    <img src="jankencrypt.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>It seems the message is padded with 1000 bytes of 'AAAAAAAA....'.</p>
+    <p>Using the properties of XOR, we can take the final 1000 bytes of the ciphertext, XOR each one with 'A', and recover what the value of 'seed' was for each byte of padding.</p>
+    <img src="seeds.png" style="width:30%;height:30%;border: 5px solid #555;">
+    <p>This an example of what that list of seeds might look like (this is not the actual cycle from flag.txt.enc). As you can see, there seems to be a pattern.</p>
+    <p>We know from the python code that 'seed' is calculated using constants, a, c, and modulus. The only differentatior that will make each seed different from the last is the use of the previous seed in the calculation.</p>
+    <p>In other words: for any given seed, the value of the next seed is deterministic.</p>
+    <p>This is what creates these cycles (in the above example 24, 105, 96, 114, 78, 150, 6, 141, 24, repeat).</p>
+    <p>It is worth noting that these cycles can be at most length=modulus (and modulus can be at most 256).</p>
+    <p>Now, let us take a look at the cycle that was actually used to encrypt the flag.</p>
+    <img src="cycle.png" style="width:80%;height:80%;border: 5px solid #555;">
+    <p>I've taken the liberty of just printing one iteration of the cycle instead of the full 1000 seeds.</p>
+    <p>This cycle is much longer than last time. In fact, it is the maximum possible length of 256. This means that every number from 0 to 256 appears exactly once.</p>
+    <p>We know that cycles of 256 can only appear when the modulus is at least 256 (which is its maximum possible value), thus <b>modulus = 256</b>.</p>
+    <p>Lets take a closer look at part of this cycle.</p>
+    <img src="0.png" style="width:10%;height:10%;border: 5px solid #555;">
+    <p>0 is followed by 63. Plugging in what we know into the given seed formula, we get:</p>
+    <p>63 = (a*0 + c) % 256</p>
+    <p>Since we know c has an upper limit of 256, we can determine that <b>c = 63</b>.</p>
+    <p>Lets keep looking around the cycle.</p>
+    <img src="1.png" style="width:10%;height:10%;border: 5px solid #555;">
+    <p>Here we see that 1 is followed by 140. Now we know that:</p>
+    <p>140 = (a + 63) % 256</p>
+    <p>Given the known bounds for a, from this we can determine that <b>a = 77</b>.</p>
+    <p>The last thing we need to calculate is the initial seed.</p>
+    <p>We've got this nice cycle of seeds in the padding, so if we know how much actual message was encrypted before the padding then we can find out the true beginning of our cycle.</p>
+    <p>We can see in the implementation that there are always 1000 bytes of padding added, so we can just check how many bytes are in the encrypted message and subtract 1000 to get the byte count of the message.</p>
+    <img src="bytecount.png" style="width:50%;height:50%;border: 5px solid #555;">
+    <p>There we have it, 238 bytes.</p>
+    <p>Checking our modulus-msg length=256-238=18th seed byte should give us the answer.</p>
+    <p>And if you'll refer to the picture of the cycle, you can see that <b>initial seed = 100</b>.</p>
+    <p>Now we can just use the built-in decryption functionality to get the flag.</p>
+    <img src="flag.png" style="width:50%;height:50%;border: 5px solid #555;">
+
+
+</body>
+</html>
